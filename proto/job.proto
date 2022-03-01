@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package job;
+
+service Job {
+    rpc Add (AddRequest) returns (AddReply);
+    rpc Del (DelRequest) returns (DelReply);
+    rpc Update (UpdateRequest) returns (UpdateReply);
+
+}
+
+message AddRequest {
+    string jobId =1;
+    uint64 delaySeconds = 2;
+    uint64 ttrSeconds =3;
+    string body =4;
+    bool isLoop =5;
+    string notifyUrl=6;
+}
+
+message AddReply {
+    string JobId=1;
+}
+
+message DelRequest{
+    string JobId =1;
+}
+
+message DelReply {
+
+}
+
+message UpdateRequest {
+    string JobId =1;
+    uint64 delaySeconds = 2;
+    uint64 ttrSeconds =3;
+    string body =4;
+    bool isLoop =5;
+    string notifyUrl=6;
+}
+
+message UpdateReply {
+    string JobId =1;
+}
