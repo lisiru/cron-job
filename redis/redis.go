@@ -100,7 +100,7 @@ func (o *RedisOption) simple() *redis.Options  {
 	}
 }
 
-func (r *RedisClient) Zadd(ctx context.Context,key string,members redis.Z) (int64,error)  {
+func (r *RedisClient) Zadd(key string,members redis.Z) (int64,error)  {
 	return r.Client.ZAdd(key,members).Result()
 }
 
@@ -128,7 +128,7 @@ func (r *RedisClient) HGetAll(key string) (map[string]string,error) {
 	return r.Client.HGetAll(key).Result()
 }
 
-func (r *RedisClient) HDel(ctx context.Context,key string,field ...string) (int64,error)   {
+func (r *RedisClient) HDel(key string,field ...string) (int64,error)   {
 	return r.Client.HDel(key,field...).Result()
 }
 
@@ -143,6 +143,8 @@ func (r *RedisClient) HMSet(key string,fields map[string]interface{}) (string,er
 func (r *RedisClient) HMget(key string,fields ...string) ([]interface{},error) {
 	return r.Client.HMGet(key,fields...).Result()
 }
+
+
 
 
 

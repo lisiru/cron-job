@@ -2,17 +2,47 @@ syntax = "proto3";
 
 package job;
 
+import "google/protobuf/any.proto";
+
+
+
+
+
 service Job {
     rpc Add (AddRequest) returns (AddReply);
     rpc Del (DelRequest) returns (DelReply);
     rpc Update (UpdateRequest) returns (UpdateReply);
+    rpc Finish (FinishRequest) returns (FinishReply);
+    rpc TestErrCode (TestErrRequest) returns (TestErrReply) ;
+
+
+}
+
+message Error {
+    int32 code =1;
+    string message =2;
+    google.protobuf.Any detail = 3;
+}
+
+message TestErrRequest {
+
+}
+
+message TestErrReply {
+
+}
+
+message FinishRequest {
+    string JobId =1;
+}
+message FinishReply {
 
 }
 
 message AddRequest {
-    string jobId =1;
-    uint64 delaySeconds = 2;
-    uint64 ttrSeconds =3;
+    string JobId =1;
+    int64 delaySeconds = 2;
+    int64 ttrSeconds =3;
     string body =4;
     bool isLoop =5;
     string notifyUrl=6;
@@ -32,8 +62,8 @@ message DelReply {
 
 message UpdateRequest {
     string JobId =1;
-    uint64 delaySeconds = 2;
-    uint64 ttrSeconds =3;
+    int64 delaySeconds = 2;
+    int64 ttrSeconds =3;
     string body =4;
     bool isLoop =5;
     string notifyUrl=6;
@@ -42,3 +72,4 @@ message UpdateRequest {
 message UpdateReply {
     string JobId =1;
 }
+
