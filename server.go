@@ -15,6 +15,7 @@ import (
 
 type server struct {
 	grpcApiServer *grpcApiServer
+	jobHandler *job.JobHandler
 
 }
 
@@ -73,6 +74,7 @@ func (c *GenericConfig) New() (*grpcApiServer,error)  {
 	//pb.RegisterCacheServer(grpcServer, cacheIns)
 
 	reflection.Register(grpcServer)
+	go jobHandler.ScanJob()
 
 	return &grpcApiServer{grpcServer, c.Addr}, nil
 

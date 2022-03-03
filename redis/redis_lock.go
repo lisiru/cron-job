@@ -5,6 +5,7 @@ import (
 	"delay-queue/pkg/logger"
 	"delay-queue/pkg/utils"
 	"github.com/go-redis/redis"
+	"github.com/vmihailenco/msgpack"
 	"math/rand"
 	"sync"
 	"sync/atomic"
@@ -16,6 +17,13 @@ type RedisLock struct {
 	expire uint32
 	key    string
 	id     string
+}
+
+func (r RedisLock) MarshalBinary() ([]byte,error) {
+	return msgpack.Marshal(r)
+}
+func (r RedisLock) UnmarshalBinary(data []byte) error {
+	return msgpack.Unmarshal(data, r)
 }
 
 var mux sync.Mutex
@@ -88,6 +96,7 @@ func (l *RedisLock) Lock() (bool, error) {
 	}
 	reply, ok := resp.(string)
 	if ok && reply == "OK" {
+		//logger.Info("加锁成功")
 		return true, nil
 
 	}
@@ -99,11 +108,14 @@ func (l *RedisLock) Lock() (bool, error) {
 func (l *RedisLock) ReleaseLock() (bool,error) {
 	resp,err:=l.client.Eval(common.DEL_COMMAND,[]string{l.key},[]string{l.id})
 	if err != nil {
+		//logger.Info("解锁错误")
 		return false, err
 	}
 	reply,ok:=resp.(int64)
 	if !ok{
+		//logger.Info("解锁失败")
 		return false,nil
 	}
+	//logger.Info("解锁成功")
 	return reply==1,nil
 }

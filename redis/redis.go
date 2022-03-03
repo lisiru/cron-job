@@ -157,7 +157,7 @@ func (r *RedisClient) ZRem(key string,members ...interface{}) (int64,error) {
 }
 
 func (r *RedisClient) Eval(script string,keys []string,args ...interface{}) (interface{},error)   {
-	return r.Client.Eval(script,keys,args).Result()
+	return r.Client.Eval(script,keys,args...).Result()
 }
 
 

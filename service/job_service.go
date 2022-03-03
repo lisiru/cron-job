@@ -19,10 +19,11 @@ type JobSrv interface {
 	AddJob(ctx context.Context, opts params.AddOrUpdateJobOptions) (string, error)
 	DelJob(ctx context.Context, opts params.DelJobOptions) (string, error)
 	UpdateJob(ctx context.Context, opts params.AddOrUpdateJobOptions) (string, error)
-	FinishJob(ctx context.Context, opts params.FinishOptions ) (string, error)
+	FinishJob(ctx context.Context, opts params.FinishOptions) (string, error)
 	TestErr(ctx context.Context) error
+	ScanDelayBucket()
+	ConsumeReadyJobQueue()
 }
-
 
 type jobService struct {
 	client *redis.RedisClient
@@ -110,17 +111,22 @@ func convertJobOptionToCacheData(opts params.AddOrUpdateJobOptions) map[string]i
 }
 
 func (j *jobService) ScanDelayBucket() {
+	logger.Info("扫描delaybucket")
 	// 加分布式锁
 	redisLock := redis.NewRedisLock(redis.WithClient(j.client), redis.WithId(utils.RandomStr(common.RANDOM_STR_LEN)), redis.WithKey(common.JOB_LOCK_KEY))
 	// 加锁
 	lockRes, _ := redisLock.Lock()
 	defer redisLock.ReleaseLock()
 	if lockRes {
+
 		// 扫描delay bucket 将score 大于等于当前时间的取出放进ready queue 并设置一个2s的时间差
 		var opt = redisV.ZRangeBy{
 			Max: utils.Int64ToString(time.Now().Unix() - 2),
 		}
-		delayJob, _ := j.client.ZRangeByScore(common.DELAY_JOB_BUKET_ZSET_KEY, opt)
+		delayJob, err := j.client.ZRangeByScore(common.DELAY_JOB_BUKET_ZSET_KEY, opt)
+		if err != nil {
+
+		}
 		if len(delayJob) == 0 {
 			return
 		}
@@ -156,6 +162,7 @@ var brPopTimeout = 1 * time.Second
 
 // 从队列中消费任务
 func (j *jobService) ConsumeReadyJobQueue() {
+	logger.Info("消费job")
 	jobId, _ := j.client.BRPop(brPopTimeout, common.JOB_READY_QUEUE_KEY)
 	if jobId == nil {
 		return

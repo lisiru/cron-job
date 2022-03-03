@@ -5,13 +5,16 @@ import (
 	"delay-queue/common"
 	"delay-queue/params"
 	"delay-queue/pkg/code"
+	"delay-queue/pkg/logger"
 	pb "delay-queue/proto"
 	"delay-queue/redis"
 	"delay-queue/service"
+	"time"
 )
 
 type JobHandler struct {
 	srv service.Service
+	scanSignal chan bool
 }
 
 func NewJobHandler(client *redis.RedisClient) *JobHandler {
@@ -70,4 +73,25 @@ func (j *JobHandler) TestErrCode(ctx context.Context, r *pb.TestErrRequest) (*pb
 		return nil, code.ToGRPCError(err)
 	}
 	return nil, nil
+}
+
+func (j *JobHandler) ScanJob()  {
+	defer func() {
+		logger.Info("任务池扫描结束")
+	}()
+
+	tick:=time.NewTicker(time.Second)
+
+	for  {
+		select {
+		case <-j.scanSignal:
+			logger.Info("收到停止信号，扫描任务终止")
+			tick.Stop()
+			return
+		case <-tick.C:
+			go j.srv.JobSrv().ScanDelayBucket()
+			go j.srv.JobSrv().ConsumeReadyJobQueue()
+
+		}
+	}
 }

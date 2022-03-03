@@ -12,7 +12,7 @@ const (
 	JOB_INFO_PREFIX          = "job_info:"            // 后面接JobId
 	DELAY_JOB_BUKET_ZSET_KEY = "delay_job_buket_zset" // 延迟任务的池，存储结构为redis 的zset
 	JOB_READY_QUEUE_KEY      = "job_readey_queue"     // 可以执行的任务队列
-	JOB_LOCK_KEY = "job_lock_key"// 加锁的key
+	JOB_LOCK_KEY = "job_lock_key_test_6"// 加锁的key
 
 )
 
