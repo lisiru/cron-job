@@ -28,7 +28,7 @@ func (r RedisLock) UnmarshalBinary(data []byte) error {
 
 var mux sync.Mutex
 var (
-	defaultExpire   uint32 = 500
+	defaultExpire   uint32 = 1
 	millisPerSecond        = 1000
 )
 

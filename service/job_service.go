@@ -119,7 +119,7 @@ func (j *jobService) ScanDelayBucket() {
 	defer redisLock.ReleaseLock()
 	if lockRes {
 
-		// 扫描delay bucket 将score 大于等于当前时间的取出放进ready queue 并设置一个2s的时间差
+		// 扫描delay bucket 将score 小于等于当前时间的取出放进ready queue 并设置一个2s的时间差
 		var opt = redisV.ZRangeBy{
 			Max: utils.Int64ToString(time.Now().Unix() - 2),
 		}
@@ -136,10 +136,11 @@ func (j *jobService) ScanDelayBucket() {
 			jobStat := utils.StringToInt(stat)
 			if jobStat != common.JOB_STAT_DELAY {
 				logger.Infof("任务:%s,已经删除状态，不需要执行", v)
-				continue
+
 			}
 			// 正常状态，丢进ready pool
-			_, err := j.client.Lpush(common.JOB_READY_QUEUE_KEY, v)
+			values, err := j.client.Lpush(common.JOB_READY_QUEUE_KEY, v)
+			logger.Infof("data:%s",values)
 			if err != nil {
 				continue
 			}
@@ -168,9 +169,9 @@ func (j *jobService) ConsumeReadyJobQueue() {
 		return
 	}
 	// 从hash中获取任务的信息，判断任务的状态是否是ready
-	jobHashCacheKey := getJobCacheKey(jobId[0], common.JOB_INFO_HASH_KEY_PREFIX)
+	jobHashCacheKey := getJobCacheKey(jobId[1], common.JOB_INFO_HASH_KEY_PREFIX)
 	jobInfo, _ := j.client.HGetAll(jobHashCacheKey)
-	if jobInfo == nil {
+	if len(jobInfo)== 0 {
 		logger.Errorf("当前任务:【%s】信息不存在,请检查", jobId)
 		return
 	}

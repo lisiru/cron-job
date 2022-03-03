@@ -33,7 +33,7 @@ func (j *JobHandler) Add(ctx context.Context, r *pb.AddRequest) (*pb.AddReply, e
 		Body:         r.Body,
 		IsLoop:       r.IsLoop,
 		NotifyUrl:    r.NotifyUrl,
-		Stat:         common.JOB_STAT_READY,
+		Stat:         common.JOB_STAT_DELAY,
 	}
 	res, err := j.srv.JobSrv().AddJob(ctx, addJobOptions)
 	if err != nil {
@@ -89,8 +89,8 @@ func (j *JobHandler) ScanJob()  {
 			tick.Stop()
 			return
 		case <-tick.C:
-			go j.srv.JobSrv().ScanDelayBucket()
-			go j.srv.JobSrv().ConsumeReadyJobQueue()
+			 //j.srv.JobSrv().ScanDelayBucket()
+			 j.srv.JobSrv().ConsumeReadyJobQueue()
 
 		}
 	}
