@@ -74,7 +74,7 @@ Finish(context.Context, *FinishRequest) (*FinishReply, error)
 
 具体的请求参数可以拉取proto文件生成。
 
-https://github.com/lisiru/cron-job/blob/master/%E6%B5%81%E7%A8%8B%E5%9B%BE%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97.jpeg
+![img](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/preview/boxcnMoPBj3ajcigiPId2SUy7Ke?mount_point=explorer&preview_type=11&version=7071184447114084380)
 
 
 
