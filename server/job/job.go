@@ -9,6 +9,7 @@ import (
 	pb "delay-queue/proto"
 	"delay-queue/redis"
 	"delay-queue/service"
+	"runtime"
 	"time"
 )
 
@@ -89,9 +90,10 @@ func (j *JobHandler) ScanJob()  {
 			tick.Stop()
 			return
 		case <-tick.C:
-			 //j.srv.JobSrv().ScanDelayBucket()
-			 j.srv.JobSrv().ConsumeReadyJobQueue()
+			go j.srv.JobSrv().ScanDelayBucket()
+			go j.srv.JobSrv().ConsumeReadyJobQueue()
 
 		}
+		logger.Infof("goroutines: %d", runtime.NumGoroutine())
 	}
 }
