@@ -5,12 +5,14 @@ import (
 	genericoptions "delay-queue/pkg/options"
 	pb "delay-queue/proto"
 	"delay-queue/server/job"
+	"net/http"
 
 	//helloworld "delay-queue/proto"
 	"delay-queue/redis"
 	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	_ "net/http/pprof"
 )
 
 type server struct {
@@ -58,6 +60,9 @@ func (s *server) PrepareRun() preparedAPIServer  {
 
 func (s preparedAPIServer) Run(stopCh <-chan struct{}) error  {
 	go s.grpcApiServer.Run()
+	go func() {
+		_ = http.ListenAndServe(":6060", nil)
+	}()
 	<-stopCh
 	s.grpcApiServer.Close()
 	return nil

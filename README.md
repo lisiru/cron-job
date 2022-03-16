@@ -74,7 +74,7 @@ Finish(context.Context, *FinishRequest) (*FinishReply, error)
 
 具体的请求参数可以拉取proto文件生成。
 
-![img](https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/preview/boxcnMoPBj3ajcigiPId2SUy7Ke?mount_point=explorer&preview_type=11&version=7071184447114084380)
+![img](https://s3.bmp.ovh/imgs/2022/03/fc26779843b488e6.jpeg)
 
 
 
